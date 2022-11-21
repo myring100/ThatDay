@@ -4,13 +4,10 @@ import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 import 'package:scroll_date_picker/scroll_date_picker.dart';
 
 DateTime _selectedDate = DateTime.now();
-String year = DateTime.now().year.toString();
-String month = DateTime.now().month.toString();
-String day = DateTime.now().day.toString();
 
 class Scroll_date extends StatefulWidget {
-  const Scroll_date({Key? key}) : super(key: key);
-
+  const Scroll_date(this.seletedDate,{Key? key}) : super(key: key);
+  final Function(DateTime) seletedDate;
   @override
   State<Scroll_date> createState() => _Scroll_dateState();
 }
@@ -34,6 +31,7 @@ class _Scroll_dateState extends State<Scroll_date> {
             onDateTimeChanged: (DateTime value) {
               setState(() {
                 _selectedDate = value;
+                widget.seletedDate(value);
               });
             },
           ),

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:that_day/dDayList/dDayList.dart';
 import 'package:that_day/screen/addPage.dart';
 
 class FirstPage extends StatefulWidget {
-  const FirstPage({Key? key, required this.title}) : super(key: key);
-  final String title;
-
+  const FirstPage();
   @override
   State<FirstPage> createState() => _FirstPageState();
 }

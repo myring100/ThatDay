@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const FirstPage(title: 'That Day(D-Day)'),
+      home: const FirstPage(),
     );
   }
 }

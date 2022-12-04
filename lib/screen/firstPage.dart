@@ -4,19 +4,22 @@ import 'package:that_day/dDayList/dDayList.dart';
 import 'package:that_day/screen/addPage.dart';
 
 class FirstPage extends StatefulWidget {
-  const FirstPage();
+  final DDayList? list;
+  const FirstPage(this.list, {Key? key}) : super(key: key);
+
   @override
   State<FirstPage> createState() => _FirstPageState();
 }
 
 class _FirstPageState extends State<FirstPage> {
-
   @override
   Widget build(BuildContext context) {
+    print('rebuildig firstpage');
+    print(widget.list==null);
+    print(widget.list?.year.toString());
     return Scaffold(
-
       appBar: AppBar(
-        title: Text(widget.title),
+        title: const Text('D-day(That Day)'),
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -32,11 +35,14 @@ class _FirstPageState extends State<FirstPage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
+        onPressed: () {
           Get.to(const AddPage());
         },
         tooltip: 'ADD',
-        child: const Icon(Icons.add,size: 30,),
+        child: const Icon(
+          Icons.add,
+          size: 30,
+        ),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }

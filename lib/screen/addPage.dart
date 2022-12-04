@@ -16,18 +16,19 @@ class AddPage extends StatefulWidget {
 class _AddPageState extends State<AddPage> {
   @override
   Widget build(BuildContext context) {
-    //todo  make callback function for date content to retrive data from widget and then get ready for summit value to database
-    int year;
-    int month;
-    int day;
-    String date;
-    String title;
-    String content;
+
+    int year=DateTime.now().year;
+    int month=DateTime.now().month;
+    int day=DateTime.now().day;
+    String date= '$year-$month-$day';
+    String title='';
+    String content='';
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         //:todo 여기서 뒤로 돌아가는 버튼이 생선된다.
         onPressed: () {
+          Get.to( FirstPage(DDayList(year,month,day,date,title,content)));
 
         },
         tooltip: 'ADD',

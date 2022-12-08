@@ -1,19 +1,19 @@
 class DBDao {
   int year;
   int day;
-  String month;
+  int month;
   String title;
   String content;
 
   DBDao(this.year, this.day, this.month, this.title, this.content);
 
-  Map toMap(){
+  Map<String , Object> toMap(){
     return Map.from({
-    "Column_year" : year,
-    "Column_day" : day;
-    "Column_month" : month;
-    "Column_title" : title;
-    "Column_content" : content;
+    "year" : year,
+    "month" : month,
+    "day" : day,
+    "title" : title,
+    "content" : content,
     });
 
 

@@ -4,25 +4,32 @@ import 'package:that_day/DB/DBDao.dart';
 import 'package:that_day/DB/DBHelper.dart';
 import 'package:that_day/screen/firstPage.dart';
 import 'package:that_day/cutomWidget/scroll_date.dart';
-
 import '../cutomWidget/inputText_widget.dart';
 
-class AddPage extends StatefulWidget {
-  const AddPage({Key? key}) : super(key: key);
+class ModifyPage extends StatefulWidget {
+ final DBDao table;
+ final int id;
 
+  const ModifyPage(this.id,this.table,{Key? key}) : super(key: key);
+
+  
   @override
-  State<AddPage> createState() => _AddPageState();
+  State<ModifyPage> createState() => _ModifyPage();
 }
 
-class _AddPageState extends State<AddPage> {
+class _ModifyPage extends State<ModifyPage> {
+  
   @override
   Widget build(BuildContext context) {
-    int year = DateTime.now().year;
-    int month = DateTime.now().month;
-    int day = DateTime.now().day;
+    DateTime selectedDate ;
+    int year = widget.table.year;
+    int month = widget.table.month;
+    int day = widget.table.day;
+
+    selectedDate = DateTime(year,month,day);
     String date = '$year-$month-$day';
-    String title = '';
-    String content = '';
+    String title = widget.table.title;
+    String content = widget.table.content;
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
@@ -30,7 +37,9 @@ class _AddPageState extends State<AddPage> {
         onPressed: () {
           DBDao dao = DBDao(year, day, month, title, content);
           DBHelper helper = DBHelper();
-          helper.insert(dao);
+
+          //todo 여기서 modify 를 id를 통해서 해야 한다.
+          helper.modify(widget.id,dao);
           Get.to(()=> const FirstPage());
         },
         tooltip: 'ADD',
@@ -41,7 +50,7 @@ class _AddPageState extends State<AddPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Scroll_date(DateTime.now(),(dateTime) {
+              Scroll_date(selectedDate,(dateTime) {
                 year = dateTime.year;
                 month = dateTime.month;
                 day = dateTime.day;
@@ -52,14 +61,12 @@ class _AddPageState extends State<AddPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Center(child: Text('Title')),
-                  InputText_widget(TextEditingController(text: ''),(input) {
+                  InputText_widget(TextEditingController(text: title),(input) {
                     title = input;
-                    print('title changed to $title');
                   }, 'Title', 1),
                   const Center(child: Text('Content')),
-                  InputText_widget(TextEditingController(text: ''),(input) {
+                  InputText_widget(TextEditingController(text: content),(input) {
                     content = input;
-                    print('content changed to $content');
                   }, 'Content', 5),
                 ],
               ),

@@ -36,9 +36,25 @@ class DBHelper {
     return records;
   }
 
+  Future deleteByID(int id) async{
+    await openDB();
+    String query = "DELETE FROM $tableName WHERE  id= '$id'";
+    db.execute(query);
+    close();
+  }
   //todo need to finish delete function.
   Future delete() async {
     await openDB();
+    await db.execute("DROP TABLE IF EXISTS $tableName");
+    await db.execute('''
+      create table $tableName ( 
+      "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  "year" integer not null,
+  "month" integer not null,
+  "day" integer not null,
+  "title" text not null,
+  "content" text not null)
+  ''');
     close();
   }
 

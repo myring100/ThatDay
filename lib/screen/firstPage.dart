@@ -5,6 +5,7 @@ import 'package:that_day/DB/DBHelper.dart';
 import 'package:that_day/screen/addPage.dart';
 
 import 'modifyPage.dart';
+import 'package:dropdown_plus/dropdown_plus.dart';
 
 class FirstPage extends StatefulWidget {
   const FirstPage({Key? key}) : super(key: key);
@@ -14,8 +15,12 @@ class FirstPage extends StatefulWidget {
 }
 
 class _FirstPageState extends State<FirstPage> {
-  Future<List<Map<String, Object?>>> helper = DBHelper().getDao();
+  late Future<List<Map<String, Object?>>> helper;
 
+
+  Future<List<Map<String,Object?>>> getDao() async{
+    return await DBHelper().getDao();
+  }
 
   @override
   void setState(VoidCallback fn) {
@@ -27,9 +32,30 @@ class _FirstPageState extends State<FirstPage> {
   @override
   Widget build(BuildContext context) {
     print('rebuildig firstpage');
+    helper = getDao();
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('D-day(That Day)'),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(
+              Icons.restore_from_trash_outlined,
+              color: Colors.white,
+            ),
+            onPressed: ()  {
+              print('delete icon clicked');
+              DBHelper table = DBHelper();
+              table.delete();
+              setState(() {super.setState(() {
+              helper = getDao();
+              });});
+
+
+              // do something
+            },
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -99,6 +125,7 @@ class _FirstPageState extends State<FirstPage> {
           ),
         ),
       ),
+
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         onPressed: () {

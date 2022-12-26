@@ -44,13 +44,11 @@ class _FirstPageState extends State<FirstPage> {
               color: Colors.white,
             ),
             onPressed: ()  {
-              print('delete icon clicked');
               DBHelper table = DBHelper();
               table.delete();
               setState(() {super.setState(() {
               helper = getDao();
               });});
-
 
               // do something
             },
@@ -105,7 +103,7 @@ class _FirstPageState extends State<FirstPage> {
                     }
                   }
                   else if(data.hasError){
-                    children.add(const Center(child: Text('Something Wrong\nTry Again')));
+                    children.add( const Expanded(child: Center(child: Text('Something Wrong\nTry Again',))));
 
                   }
                   else {

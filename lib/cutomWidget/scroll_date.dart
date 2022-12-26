@@ -15,7 +15,6 @@ class Scroll_date extends StatefulWidget {
 class _Scroll_dateState extends State<Scroll_date> {
   @override
   Widget build(BuildContext context) {
-    print("seletected day is = ${widget._selectedDate.day}");
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

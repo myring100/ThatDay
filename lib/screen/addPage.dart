@@ -24,23 +24,41 @@ class _AddPageState extends State<AddPage> {
     String title = '';
     String content = '';
     return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+        title: const Text('Add Event',style: TextStyle(fontSize: 20,color: Colors.white),),
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         //:todo 여기서 뒤로 돌아가는 버튼이 생선된다.
         onPressed: () {
-          DBDao dao = DBDao(year, day, month, title, content);
-          DBHelper helper = DBHelper();
-          helper.insert(dao);
-          Get.to(()=> const FirstPage());
+          if(title!='' && content != ''){
+            DBDao dao = DBDao(year, day, month, title, content);
+            DBHelper helper = DBHelper();
+            helper.insert(dao);
+            Get.to(()=> const FirstPage());
+          }
+          else {
+            SnackBar snackBar =  const SnackBar(
+            content: Text('Please Fill Form',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 15,color: Colors.white),
+            ),
+          );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          }
+
         },
         tooltip: 'ADD',
         child: const Icon(Icons.check, size: 30),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
+          child:
+          Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              const SizedBox(height: 15,),
               Scroll_date(DateTime.now(),(dateTime) {
                 year = dateTime.year;
                 month = dateTime.month;

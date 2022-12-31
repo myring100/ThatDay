@@ -43,9 +43,9 @@ class _FirstPageState extends State<FirstPage> {
               Icons.restore_from_trash_outlined,
               color: Colors.white,
             ),
-            onPressed: ()  {
+            onPressed: () async {
               DBHelper table = DBHelper();
-              table.delete();
+              await table.delete();
               setState(() {super.setState(() {
               helper = getDao();
               });});
@@ -55,73 +55,63 @@ class _FirstPageState extends State<FirstPage> {
           )
         ],
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              FutureBuilder<List<Map<String, Object?>>>(
-                future: helper,
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Map<String, Object?>>> data) {
-                  List<Widget> children = [];
-                  if (data.hasData) {
-                    var myLiteror = data.data?.reversed.iterator;
-                    while (myLiteror!.moveNext()) {
-                      int id = int.parse(myLiteror.current['id'].toString());
-                      String title = myLiteror.current['title'].toString();
-                      String content = myLiteror.current['content'].toString();
-                      int year = int.parse(myLiteror.current['year'].toString());
-                      int month = int.parse(myLiteror.current['month'].toString());
-                      int day = int.parse(myLiteror.current['day'].toString());
-                      DBDao table = DBDao(year, day, month, title, content);
+      body: FutureBuilder<List<Map<String, Object?>>>(
+        future: helper,
+        builder: (BuildContext context,
+            AsyncSnapshot<List<Map<String, Object?>>> data) {
+          List<Widget> children = [];
+          if (data.hasData) {
+            var myLiteror = data.data?.reversed.iterator;
+            while (myLiteror!.moveNext()) {
+              int id = int.parse(myLiteror.current['id'].toString());
+              String title = myLiteror.current['title'].toString();
+              String content = myLiteror.current['content'].toString();
+              int year = int.parse(myLiteror.current['year'].toString());
+              int month = int.parse(myLiteror.current['month'].toString());
+              int day = int.parse(myLiteror.current['day'].toString());
+              int backGround = int.parse(myLiteror.current['backGround'].toString());
+              DBDao table = DBDao(year, day, month, title, content,backGround);
 
-                      children.add(
-                          Card(
-                        margin: const EdgeInsets.all(10),
-                        shadowColor: Colors.grey,
-                        child: InkWell(
-                          onTap: (){
+              children.add(
+                  Card(
+                margin: const EdgeInsets.all(10),
+                shadowColor: Colors.grey,
+                //todo here we have backGroundColor
+                color: Colors.grey,
+                child: InkWell(
+                  onTap: (){
 
-                            Get.to(ModifyPage(id,table));
+                    Get.to(ModifyPage(id,table));
 
-                          },
-                          onLongPress: (){
+                  },
+                  onLongPress: (){
 
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(30.0),
-                            child: Text(
-                              title,
-                              style: const TextStyle(
-                                fontSize: 15,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ));
-                    }
-                  }
-                  else if(data.hasError){
-                    children.add( const Expanded(child: Center(child: Text('Something Wrong\nTry Again',))));
-
-                  }
-                  else {
-                    children.add(const Center(child: Text('Add Event')));
-                  }
-
-                  return Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: children,
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 15,
+                      ),
                     ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
+                  ),
+                ),
+              ));
+            }
+          }
+          else if(data.hasError){
+            children.add( const Expanded(child: Center(child: Text('Something Wrong\nTry Again',))));
+
+          }
+          else {
+            children.add(const Center(child: Text('Add Event')));
+          }
+
+          return Column(
+            children: children,
+          );
+        },
       ),
 
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

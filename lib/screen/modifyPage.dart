@@ -30,17 +30,21 @@ class _ModifyPage extends State<ModifyPage> {
     String date = '$year-$month-$day';
     String title = widget.table.title;
     String content = widget.table.content;
+    int backGround = 0;
     return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+        title: const Text('Modify Event',style: TextStyle(fontSize: 20,color: Colors.white),),
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         //:todo 여기서 뒤로 돌아가는 버튼이 생선된다.
-        onPressed: () {
-          DBDao dao = DBDao(year, day, month, title, content);
+        onPressed: () async {
+          DBDao dao = DBDao(year, day, month, title, content,backGround);
           DBHelper helper = DBHelper();
 
           //todo 여기서 modify 를 id를 통해서 해야 한다.
-          helper.modify(widget.id,dao);
-          Get.to(()=> const FirstPage());
+         await helper.modify(widget.id,dao).then((value) =>Get.to(()=> const FirstPage()));
         },
         tooltip: 'ADD',
         child: const Icon(Icons.check, size: 30),
@@ -50,6 +54,7 @@ class _ModifyPage extends State<ModifyPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              const SizedBox(height: 15,),
               Scroll_date(selectedDate,(dateTime) {
                 year = dateTime.year;
                 month = dateTime.month;

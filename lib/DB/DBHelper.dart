@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sql.dart';
 import 'package:sqflite/sqlite_api.dart';
@@ -19,7 +18,8 @@ class DBHelper {
   "month" integer not null,
   "day" integer not null,
   "title" text not null,
-  "content" text not null)
+  "content" text not null,
+  "backGround" integer not null,)
   ''');
     });
   }
@@ -53,7 +53,8 @@ class DBHelper {
   "month" integer not null,
   "day" integer not null,
   "title" text not null,
-  "content" text not null)
+  "content" text not null,
+  "backGround int not null)
   ''');
     close();
   }
@@ -63,6 +64,7 @@ class DBHelper {
     String updateQuery  =
         "UPDATE $tableName SET year = '${dbDao.year}',month = '${dbDao.month}'"
         ",day = '${dbDao.day}', title = '${dbDao.title}', content = '${dbDao.content}'"
+        ",backGround ='${dbDao.backGround}'"
         "WHERE id = '$id'";
 
 

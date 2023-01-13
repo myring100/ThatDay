@@ -19,7 +19,8 @@ class DBHelper {
   "day" integer not null,
   "title" text not null,
   "content" text not null,
-  "backGround" integer not null,)
+  "backGround" integer not null,
+  "alarm" integer not null)
   ''');
     });
   }
@@ -54,7 +55,8 @@ class DBHelper {
   "day" integer not null,
   "title" text not null,
   "content" text not null,
-  "backGround int not null)
+  "backGround" integer not null,
+  "alarm" integer not null)
   ''');
     close();
   }
@@ -64,7 +66,7 @@ class DBHelper {
     String updateQuery  =
         "UPDATE $tableName SET year = '${dbDao.year}',month = '${dbDao.month}'"
         ",day = '${dbDao.day}', title = '${dbDao.title}', content = '${dbDao.content}'"
-        ",backGround ='${dbDao.backGround}'"
+        ",backGround ='${dbDao.backGround}',alarm = '${dbDao.alarm}'"
         "WHERE id = '$id'";
 
 
@@ -74,4 +76,13 @@ class DBHelper {
   }
 
   Future close() async => db.close();
+
+  Future setAlarm(bool isAlarmOn,int id) async{
+    String query =
+        "UPDATE $tableName SET alarm = '$isAlarmOn}'"
+        "WHERE id = '$id'";
+    await openDB();
+    db.rawQuery(query);
+    close();
+  }
 }

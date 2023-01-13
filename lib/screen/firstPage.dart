@@ -3,9 +3,7 @@ import 'package:get/get.dart';
 import 'package:that_day/DB/DBDao.dart';
 import 'package:that_day/DB/DBHelper.dart';
 import 'package:that_day/screen/addPage.dart';
-
 import 'modifyPage.dart';
-import 'package:dropdown_plus/dropdown_plus.dart';
 
 class FirstPage extends StatefulWidget {
   const FirstPage({Key? key}) : super(key: key);
@@ -61,6 +59,9 @@ class _FirstPageState extends State<FirstPage> {
             AsyncSnapshot<List<Map<String, Object?>>> data) {
           List<Widget> children = [];
           if (data.hasData) {
+            if(data.data!.isEmpty){
+              children.add(const Expanded(child: Center(child: Text('Add Event',style: TextStyle(fontSize: 24),))));
+            }
             var myLiteror = data.data?.reversed.iterator;
             while (myLiteror!.moveNext()) {
               int id = int.parse(myLiteror.current['id'].toString());
@@ -70,14 +71,16 @@ class _FirstPageState extends State<FirstPage> {
               int month = int.parse(myLiteror.current['month'].toString());
               int day = int.parse(myLiteror.current['day'].toString());
               int backGround = int.parse(myLiteror.current['backGround'].toString());
-              DBDao table = DBDao(year, day, month, title, content,backGround);
+              int alarm = int.parse(myLiteror.current['alarm'].toString());
+              DBDao table = DBDao(year, day, month, title, content,backGround,alarm);
+
 
               children.add(
                   Card(
                 margin: const EdgeInsets.all(10),
-                shadowColor: Colors.grey,
+                shadowColor: Colors.white54,
                 //todo here we have backGroundColor
-                color: Colors.grey,
+                color: Color(backGround),
                 child: InkWell(
                   onTap: (){
 
@@ -101,14 +104,15 @@ class _FirstPageState extends State<FirstPage> {
             }
           }
           else if(data.hasError){
-            children.add( const Expanded(child: Center(child: Text('Something Wrong\nTry Again',))));
-
+            children.add(const Expanded(child: Center(child: Text('Something Wrong\nTry Again',style: TextStyle(fontSize: 24),))));
           }
           else {
-            children.add(const Center(child: Text('Add Event')));
+            children.add(const Expanded(child: Center(child: Text('Add Event',style: TextStyle(fontSize: 24),))));
           }
 
           return Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: children,
           );
         },
@@ -126,5 +130,11 @@ class _FirstPageState extends State<FirstPage> {
         ),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
   }
 }

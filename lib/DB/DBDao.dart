@@ -5,8 +5,9 @@ class DBDao {
   String title;
   String content;
   int backGround;
+  int alarm;
 
-  DBDao(this.year, this.day, this.month, this.title, this.content,this.backGround);
+  DBDao(this.year, this.day, this.month, this.title, this.content,this.backGround,this.alarm);
 
   Map<String , Object> toMap(){
     return Map.from({
@@ -16,6 +17,7 @@ class DBDao {
     "title" : title,
     "content" : content,
       "backGround" : backGround,
+      "alarm" : alarm,
     });
 
 

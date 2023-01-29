@@ -58,86 +58,91 @@ class _FirstPageState extends State<FirstPage> {
           )
         ],
       ),
-      body: FutureBuilder<List<Map<String, Object?>>>(
+      body: LayoutBuilder(
+        builder: (context , constraint ) =>
+            Container(
+              height: constraint.maxHeight,
+              child: Expanded(
+                child: SingleChildScrollView(
+                  child: FutureBuilder<List<Map<String, Object?>>>(
+          future: helper,
+          builder: (context, AsyncSnapshot<List<Map<String, Object?>>> data) {
+                  List<Widget> children = [];
+                  if (data.hasData) {
+                    if(data.data!.isEmpty){
+                      children.add(const Expanded(child: Center(child: Text('Add Event',style: TextStyle(fontSize: 24),))));
+                    }
+                    else{
+                      var myLiteror = data.data?.reversed.iterator;
+                      next_db_ID = int.parse(data.data!.last['id'].toString())+1;
+                      while (myLiteror!.moveNext()) {
+                        int id = int.parse(myLiteror.current['id'].toString());
+                        String title = myLiteror.current['title'].toString();
+                        String content = myLiteror.current['content'].toString();
+                        int year = int.parse(myLiteror.current['year'].toString());
+                        int month = int.parse(myLiteror.current['month'].toString());
+                        int day = int.parse(myLiteror.current['day'].toString());
+                        int backGround = int.parse(myLiteror.current['backGround'].toString());
+                        int alarm = int.parse(myLiteror.current['alarm'].toString());
+                        DBDao table = DBDao(year, day, month, title, content,backGround,alarm);
+                        String dDay = Utilities.getDDay(DateTime(year,month,day));
+                        children.add(
+                            Card(
+                              margin: const EdgeInsets.all(10),
+                              shadowColor: Colors.white54,
+                              //todo here we have backGroundColor
+                              color: Color(backGround),
+                              child: InkWell(
+                                onTap: (){
+                                  Get.to(ModifyPage(id,table));
+                                },
+                                onLongPress: (){
 
-
-
-        future: helper,
-        builder: (BuildContext context, AsyncSnapshot<List<Map<String, Object?>>> data) {
-          List<Widget> children = [];
-          if (data.hasData) {
-            if(data.data!.isEmpty){
-              children.add(const Expanded(child: Center(child: Text('Add Event',style: TextStyle(fontSize: 24),))));
-            }
-            else{
-              var myLiteror = data.data?.reversed.iterator;
-              next_db_ID = int.parse(data.data!.last['id'].toString())+1;
-              while (myLiteror!.moveNext()) {
-                int id = int.parse(myLiteror.current['id'].toString());
-                String title = myLiteror.current['title'].toString();
-                String content = myLiteror.current['content'].toString();
-                int year = int.parse(myLiteror.current['year'].toString());
-                int month = int.parse(myLiteror.current['month'].toString());
-                int day = int.parse(myLiteror.current['day'].toString());
-                int backGround = int.parse(myLiteror.current['backGround'].toString());
-                int alarm = int.parse(myLiteror.current['alarm'].toString());
-                DBDao table = DBDao(year, day, month, title, content,backGround,alarm);
-                String dDay = Utilities.getDDay(DateTime(year,month,day));
-                children.add(
-                    Card(
-                      margin: const EdgeInsets.all(10),
-                      shadowColor: Colors.white54,
-                      //todo here we have backGroundColor
-                      color: Color(backGround),
-                      child: InkWell(
-                        onTap: (){
-                          Get.to(ModifyPage(id,table));
-                        },
-                        onLongPress: (){
-
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(30.0),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  title,
-                                  style: const TextStyle(
-                                    fontSize: 20,
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(30.0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          title,
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                      Text(
+                                        dDay,
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.grey,
+                                        ),
+                                      )
+                                    ],
                                   ),
-                                  textAlign: TextAlign.center,
                                 ),
                               ),
-                              Text(
-                                dDay,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ));
-              }
-            }
-
-          }
-          else if(data.hasError){
-            children.add(const Expanded(child: Center(child: Text('Something Wrong\nTry Again',style: TextStyle(fontSize: 24),))));
-          }
-          else {
-            children.add(const Expanded(child: Center(child: Text('Add Event',style: TextStyle(fontSize: 24),))));
-          }
-
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: children,
-          );
-        },
+                            ));
+                      }
+                    }
+                  }
+                  else if(data.hasError){
+                    children.add(const Expanded(child: Center(child: Text('Something Wrong\nTry Again',style: TextStyle(fontSize: 24),))));
+                  }
+                  else {
+                    children.add(const Expanded(child: Center(child: Text('Add Event',style: TextStyle(fontSize: 24),))));
+                  }
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: children,);
+          },
+        ),
+                ),
+              ),
+            ),
       ),
 
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

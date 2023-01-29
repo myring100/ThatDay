@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 import 'package:scroll_date_picker/scroll_date_picker.dart';
 
 
@@ -24,7 +22,7 @@ class _Scroll_dateState extends State<Scroll_date> {
 
         ),
         SizedBox(
-          height: 250,
+          height: 200,
           child: ScrollDatePicker(
             selectedDate: widget._selectedDate,
             locale: const Locale('en'),

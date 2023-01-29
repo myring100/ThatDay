@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:that_day/DB/DBDao.dart';
@@ -5,13 +6,17 @@ import 'package:that_day/DB/DBHelper.dart';
 import 'package:that_day/screen/firstPage.dart';
 import 'package:that_day/cutomWidget/scroll_date.dart';
 import 'package:that_day/service/notificationHelper.dart';
-import 'package:that_day/service/utilities.dart';
 import '../cutomWidget/inputText_widget.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:action_slider/action_slider.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+
+late StreamSubscription<bool> keyboardSubscription;
+var keyboardVisibilityController = KeyboardVisibilityController();
 
 class AddPage extends StatefulWidget {
-  const AddPage({Key? key}) : super(key: key);
+  const AddPage(this.id,{Key? key}) : super(key: key);
+  final int id;
 
   @override
   State<AddPage> createState() => _AddPageState();
@@ -19,118 +24,151 @@ class AddPage extends StatefulWidget {
 
 class _AddPageState extends State<AddPage> {
   final _controller = ActionSliderController();
-
+  bool isshowFAB = true;
   @override
   Widget build(BuildContext context) {
+    int id = widget.id;
     int buttonColor = Colors.white.value;
     int year = DateTime.now().year;
     int month = DateTime.now().month;
     int day = DateTime.now().day;
-    String date = '$year-$month-$day';
     String title = '';
     String content = '';
     int alarm = 0;
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
-        title: const Text(
-          'Add Event',
-          style: TextStyle(fontSize: 20, color: Colors.white),
+    return GestureDetector(
+      onTapDown: (a){
+        print('onTapDown tap down');
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      onTap: (){
+        print('focus finder = ${FocusManager.instance.primaryFocus?.hasFocus}');
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: true,
+          title: const Center(
+            child: Text(
+              'Add Event',
+              style: TextStyle(fontSize: 20, color: Colors.white),
+            ),
+          ),
         ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        //:todo 여기서 뒤로 돌아가는 버튼이 생선된다.
-        onPressed: () {
-          if (title != '' && content != '') {
-            DBDao dao =
-                DBDao(year, day, month, title, content, buttonColor, alarm);
-            DBHelper helper = DBHelper();
-            helper.insert(dao);
-            if (alarm == 1) {
-              NotificationHelper notificationHelper = NotificationHelper();
-              notificationHelper.createNotification('hi', 'test',
-                  DateTime(year,month,day));
-            }
-            Get.to(() => const FirstPage());
-          } else {
-            SnackBar snackBar = const SnackBar(
-              content: Text(
-                'Please Fill Form',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 15, color: Colors.white),
-              ),
-            );
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          }
-        },
-        tooltip: 'ADD',
-        child: const Icon(Icons.check, size: 30),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const SizedBox(
-                height: 15,
-              ),
-              Scroll_date(DateTime.now(), (dateTime) {
-                year = dateTime.year;
-                month = dateTime.month;
-                day = dateTime.day;
-                date = '$year-$month-$day';
-              }),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Center(child: Text('Title')),
-                  InputText_widget(TextEditingController(text: ''), (input) {
-                    title = input;
-                  }, 'Title', 1),
-                  const Center(child: Text('Content')),
-                  InputText_widget(TextEditingController(text: ''), (input) {
-                    content = input;
-                  }, 'Content', 5),
-                ],
-              ),
-              BlockPicker(
-                pickerColor: Color(buttonColor),
-                onColorChanged: (color) {
-                  buttonColor = color.value;
-                  print("button color changed to $buttonColor");
-                },
-                availableColors: [
-                  Color(buttonColor),
-                  Colors.red,
-                  Colors.blue,
-                  Colors.green,
-                  Colors.yellow,
-                  Colors.purple
-                ],
-                itemBuilder: customItembuilder_colorPicker,
-                layoutBuilder: customLayoutBuilder,
-              ),
-              ActionSlider.standard(
-                width: 250,
-                height: 50,
-                controller: _controller,
-                successIcon: IconButton(
-                  onPressed: () {
-                    alarm = 0;
-                    _controller.reset();
-                  },
-                  icon: Icon(Icons.alarm),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: Visibility(
+          visible: keyboardVisibilityController.isVisible ? false : true,
+          child: FloatingActionButton(
+            //:todo 여기서 뒤로 돌아가는 버튼이 생선된다.
+            onPressed: () {
+              if (title != '' && content != '') {
+                DBDao dao =
+                    DBDao(year, day, month, title, content, buttonColor, alarm);
+                DBHelper helper = DBHelper();
+                helper.insert(dao);
+                if (alarm == 1) {
+                  NotificationHelper notificationHelper = NotificationHelper();
+                  notificationHelper.createNotification(id, title, content,
+                      DateTime(year,month,day));
+                }
+                Get.to(() => const FirstPage());
+              } else {
+                SnackBar snackBar = const SnackBar(
+                  content: Text(
+                    'Please Fill Form',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 15, color: Colors.white),
+                  ),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              }
+            },
+            tooltip: 'ADD',
+            child: const Icon(Icons.check, size: 30),
+          ),
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const SizedBox(
+                  height: 15,
                 ),
-                child: const Text('Set Alarm'),
-                action: (controller) async {
-                  alarm = 1;
-                  controller.loading(); //starts loading animation
-                  await Future.delayed(const Duration(seconds: 1));
-                  controller.success();
-                },
-              )
-            ],
+                Scroll_date(DateTime.now(), (dateTime) {
+                  year = dateTime.year;
+                  month = dateTime.month;
+                  day = dateTime.day;
+                  if(DateTime(year,month,day).isBefore(DateTime.now())){
+                    _controller.reset();
+                  }
+                }),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Center(child: Text('Title')),
+                    InputText_widget(TextEditingController(text: ''), (input) {
+                      title = input;
+                      }, 'Title', 1),
+                    const Center(child: Text('Content')),
+                    InputText_widget(TextEditingController(text: ''), (input) {
+                      content = input;
+                    }, 'Content', 5),
+                  ],
+                ),
+                BlockPicker(
+                  pickerColor: Color(buttonColor),
+                  onColorChanged: (color) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    buttonColor = color.value;
+                  },
+                  availableColors: [
+                    Color(buttonColor),
+                    Colors.red,
+                    Colors.blue,
+                    Colors.green,
+                    Colors.yellow,
+                    Colors.purple
+                  ],
+                  itemBuilder: customItembuilder_colorPicker,
+                  layoutBuilder: customLayoutBuilder,
+                ),
+                ActionSlider.standard(
+                  width: 250,
+                  height: 50,
+                  controller: _controller,
+                  successIcon: IconButton(
+                    onPressed: () {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      alarm = 0;
+                      _controller.reset();
+                    },
+                    icon: const Icon(Icons.alarm),
+                  ),
+                  child: const Text('Set Alarm'),
+                  action: (controller) async {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    if(DateTime.now().isBefore(DateTime(year,month,day))){
+                      alarm = 1;
+                      controller.loading(); //starts loading animation
+                      await Future.delayed(const Duration(seconds: 1));
+                      controller.success();
+                    }
+                    else{
+                      alarm = 0;
+                      SnackBar snackBar = const SnackBar(
+                        content: Text(
+                          'Not allowed past alarm',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 15, color: Colors.white),
+                        ),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    }
+
+                  },
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -181,10 +219,5 @@ class _AddPageState extends State<AddPage> {
         children: [for (Color color in colors) child(color)],
       ),
     );
-  }
-
-  @override
-  void setState(VoidCallback fn) {
-    super.setState(() {});
   }
 }

@@ -43,6 +43,7 @@ dependencies:
   slide_switcher: ^1.1.2
   action_slider: ^0.6.1
   awesome_notifications: any
+  flutter_keyboard_visibility: ^5.4.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

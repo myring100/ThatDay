@@ -3,8 +3,12 @@ import 'package:get/get.dart';
 import 'package:that_day/DB/DBDao.dart';
 import 'package:that_day/DB/DBHelper.dart';
 import 'package:that_day/screen/addPage.dart';
+import 'package:that_day/service/notificationHelper.dart';
+import 'package:that_day/service/utilities.dart';
 import 'modifyPage.dart';
 
+
+int next_db_ID = 1;
 class FirstPage extends StatefulWidget {
   const FirstPage({Key? key}) : super(key: key);
 
@@ -42,6 +46,7 @@ class _FirstPageState extends State<FirstPage> {
               color: Colors.white,
             ),
             onPressed: () async {
+              NotificationHelper.cancelAllNoti();
               DBHelper table = DBHelper();
               await table.delete();
               setState(() {super.setState(() {
@@ -54,54 +59,69 @@ class _FirstPageState extends State<FirstPage> {
         ],
       ),
       body: FutureBuilder<List<Map<String, Object?>>>(
+
         future: helper,
-        builder: (BuildContext context,
-            AsyncSnapshot<List<Map<String, Object?>>> data) {
+        builder: (BuildContext context, AsyncSnapshot<List<Map<String, Object?>>> data) {
           List<Widget> children = [];
           if (data.hasData) {
             if(data.data!.isEmpty){
               children.add(const Expanded(child: Center(child: Text('Add Event',style: TextStyle(fontSize: 24),))));
             }
-            var myLiteror = data.data?.reversed.iterator;
-            while (myLiteror!.moveNext()) {
-              int id = int.parse(myLiteror.current['id'].toString());
-              String title = myLiteror.current['title'].toString();
-              String content = myLiteror.current['content'].toString();
-              int year = int.parse(myLiteror.current['year'].toString());
-              int month = int.parse(myLiteror.current['month'].toString());
-              int day = int.parse(myLiteror.current['day'].toString());
-              int backGround = int.parse(myLiteror.current['backGround'].toString());
-              int alarm = int.parse(myLiteror.current['alarm'].toString());
-              DBDao table = DBDao(year, day, month, title, content,backGround,alarm);
+            else{
+              var myLiteror = data.data?.reversed.iterator;
+              next_db_ID = int.parse(data.data!.last['id'].toString())+1;
+              while (myLiteror!.moveNext()) {
+                int id = int.parse(myLiteror.current['id'].toString());
+                String title = myLiteror.current['title'].toString();
+                String content = myLiteror.current['content'].toString();
+                int year = int.parse(myLiteror.current['year'].toString());
+                int month = int.parse(myLiteror.current['month'].toString());
+                int day = int.parse(myLiteror.current['day'].toString());
+                int backGround = int.parse(myLiteror.current['backGround'].toString());
+                int alarm = int.parse(myLiteror.current['alarm'].toString());
+                DBDao table = DBDao(year, day, month, title, content,backGround,alarm);
+                String dDay = Utilities.getDDay(DateTime(year,month,day));
+                children.add(
+                    Card(
+                      margin: const EdgeInsets.all(10),
+                      shadowColor: Colors.white54,
+                      //todo here we have backGroundColor
+                      color: Color(backGround),
+                      child: InkWell(
+                        onTap: (){
+                          Get.to(ModifyPage(id,table));
+                        },
+                        onLongPress: (){
 
-
-              children.add(
-                  Card(
-                margin: const EdgeInsets.all(10),
-                shadowColor: Colors.white54,
-                //todo here we have backGroundColor
-                color: Color(backGround),
-                child: InkWell(
-                  onTap: (){
-
-                    Get.to(ModifyPage(id,table));
-
-                  },
-                  onLongPress: (){
-
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(30.0),
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 15,
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  title,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              Text(
+                                dDay,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-              ));
+                    ));
+              }
             }
+
           }
           else if(data.hasError){
             children.add(const Expanded(child: Center(child: Text('Something Wrong\nTry Again',style: TextStyle(fontSize: 24),))));
@@ -118,10 +138,10 @@ class _FirstPageState extends State<FirstPage> {
         },
       ),
 
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Get.to(const AddPage());
+          Get.to(() => AddPage(next_db_ID));
         },
         tooltip: 'ADD',
         child: const Icon(

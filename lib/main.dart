@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       navigatorKey: navigatorKey,
       title: 'That Day(D-Day)',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        appBarTheme:  AppBarTheme(color: Colors.lightBlue[500])
       ),
       home: const FirstPage(),
     );

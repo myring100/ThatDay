@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:that_day/DB/DBDao.dart';
@@ -6,6 +8,7 @@ import 'package:that_day/screen/addPage.dart';
 import 'package:that_day/service/notificationHelper.dart';
 import 'package:that_day/service/utilities.dart';
 import 'modifyPage.dart';
+import 'package:that_day/kStyle.dart';
 
 
 int next_db_ID = 1;
@@ -37,14 +40,13 @@ class _FirstPageState extends State<FirstPage> {
     helper = getDao();
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 70,
+        centerTitle: true,
         automaticallyImplyLeading: false,
-        title: const Text('D-day(That Day)'),
+        title: Text('D-day(That Day)',style: kMainTitle,),
         actions: <Widget>[
           IconButton(
-            icon: const Icon(
-              Icons.restore_from_trash_outlined,
-              color: Colors.white,
-            ),
+            icon: kTrashIcon,
             onPressed: () async {
               NotificationHelper.cancelAllNoti();
               DBHelper table = DBHelper();
@@ -54,115 +56,73 @@ class _FirstPageState extends State<FirstPage> {
                   helper = getDao();
                 });
               });
-
-              // do something
             },
           )
         ],
       ),
       body: LayoutBuilder(
         builder: (context, constraint )=>
-            SingleChildScrollView(
-          child: FutureBuilder<List<Map<String, Object?>>>(
-            future: helper,
-            builder:
-                (context, AsyncSnapshot<List<Map<String, Object?>>> data) {
-              List<Widget> children = [];
-              if (data.hasData) {
-                if (data.data!.isEmpty) {
-                  children.add(const Expanded(
-                      child: Center(
-                          child: Text(
-                    'Add Event',
-                    style: TextStyle(fontSize: 24),
-                  ))));
-                } else {
-                  var myLiteror = data.data?.reversed.iterator;
-                  next_db_ID = int.parse(data.data!.last['id'].toString()) + 1;
-                  while (myLiteror!.moveNext()) {
-                    int id = int.parse(myLiteror.current['id'].toString());
-                    String title = myLiteror.current['title'].toString();
-                    String content = myLiteror.current['content'].toString();
-                    int year = int.parse(myLiteror.current['year'].toString());
-                    int month = int.parse(myLiteror.current['month'].toString());
-                    int day = int.parse(myLiteror.current['day'].toString());
-                    int backGround = int.parse(myLiteror.current['backGround'].toString());
-                    int alarm = int.parse(myLiteror.current['alarm'].toString());
-                    DBDao table = DBDao(year, day, month, title, content, backGround, alarm);
-                    String dDay = Utilities.getDDay(DateTime(year, month, day));
-                    children.add(
-                        Card(margin: const EdgeInsets.all(10),
-                        shadowColor: Colors.white54,
-                        color: Color(backGround),
-                        child: InkWell(onTap: () {Get.to(ModifyPage(id, table));},
-                            child: Padding(
-                              padding: const EdgeInsets.all(30.0),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      title,
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                  Text(
-                                    dDay,
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.grey,
-                                    ),
-                                  )
-                                ],
+            FutureBuilder<List<Map<String, Object?>>>(
+                future: helper,
+                builder:
+                    (context, AsyncSnapshot<List<Map<String, Object?>>> data) {
+                  if (data.hasData) {
+                    if (data.data!.isEmpty) {
+                      return customText('Add Event');
+                    }
+                    else {
+                      next_db_ID = int.parse(data.data!.last['id'].toString()) + 1;
+                      return ListView.builder(
+                        shrinkWrap: true,
+                          itemCount: data.data!.length,
+                          itemBuilder: (context, index){
+                            var singleData = data.data!.reversed.elementAt(index);
+                            int id = int.parse(singleData['id'].toString());
+                            String title = singleData['title'].toString();
+                            String content = singleData['content'].toString();
+                            int year = int.parse(singleData['year'].toString());
+                            int month = int.parse(singleData['month'].toString());
+                            int day = int.parse(singleData['day'].toString());
+                            int backGround = int.parse(singleData['backGround'].toString());
+                            int alarm = int.parse(singleData['alarm'].toString());
+                            DBDao table = DBDao(year, day, month, title, content, backGround, alarm);
+                            String dDay = Utilities.getDDay(DateTime(year, month, day));
+                            return Card(
+                              shape: kCardShape,
+                              margin: const EdgeInsets.all(10),
+                              shadowColor: Colors.grey,
+                              color: Color(backGround),
+                              child: Padding(
+                                padding: const EdgeInsets.all(10),
+                                child: ListTile(
+                                  onTap: ()=>Get.to(ModifyPage(id, table)),
+                                  title: Text(title,style: kListMainText,textAlign: TextAlign.center,),
+                                  subtitle: Text(dDay,textAlign: TextAlign.right,style: kListSubTitle,),
+                                ),
                               ),
-                            ),
-                        ),
-                    ));
+                            );
+                        });
+                    }
                   }
-                }
-              }
-              else if (data.hasError) {
-                children.add(const Expanded(
-                    child: Center(
-                        child: Text(
-                  'Something Wrong\nTry Again',
-                  style: TextStyle(fontSize: 24),
-                ))));
-              } else {
-                children.add(const Expanded(
-                    child: Center(
-                        child: Text(
-                  'Add Event',
-                  style: TextStyle(fontSize: 24),
-                ))));
-              }
-              return SizedBox(
-                height: constraint.maxHeight,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children:children
-
-                ),
-              );
-            },
-          ),
-        ),
+                  else if (data.hasError) {
+                    return customText('Something Wrong\nTry Again');
+                  }
+                  else {
+                   return customText('Add Event');
+                  }
+                  },
+            ),
       ),
 
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Visibility(
-        visible: false,
+        visible: true,
         child: FloatingActionButton(
           onPressed: () {
             Get.to(() => AddPage(next_db_ID));
           },
           tooltip: 'ADD',
-          child: const Icon(
-            Icons.add,
-            size: 30,
-          ),
+          child: kAddIcon,
         ),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
@@ -171,6 +131,13 @@ class _FirstPageState extends State<FirstPage> {
   @override
   void initState() {
     super.initState();
+  }
 
+  Widget customText(String text){
+    return  Center(
+        child: Text(
+          text,
+          style: kCustomText,
+        ));
   }
 }

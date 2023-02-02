@@ -17,12 +17,12 @@ class _Scroll_dateState extends State<Scroll_date> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          "${widget._selectedDate.year}-${widget._selectedDate.month}-${widget._selectedDate.day}",
+          "${widget._selectedDate.month}-${widget._selectedDate.day}-${widget._selectedDate.year}",
           style: const TextStyle(color: Colors.black,fontSize: 20),
 
         ),
         SizedBox(
-          height: 200,
+          height: 150,
           child: ScrollDatePicker(
             maximumDate: DateTime.now().add(const Duration(days: 365*100)),
             minimumDate: DateTime.now().subtract(const Duration(days: 365*100)),

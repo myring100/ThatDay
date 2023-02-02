@@ -87,88 +87,98 @@ class _AddPageState extends State<AddPage> {
           ),
         ),
         body: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
+          child: LayoutBuilder(
+            builder: (context, constraint )=>
+            Column(
               children: [
-                const SizedBox(
-                  height: 15,
-                ),
-                Scroll_date(DateTime.now(), (dateTime) {
-                  year = dateTime.year;
-                  month = dateTime.month;
-                  day = dateTime.day;
-                  if(DateTime(year,month,day).isBefore(DateTime.now())){
-                    _controller.reset();
-                  }
-                }),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Center(child: Text('Title')),
-                    InputText_widget(TextEditingController(text: ''), (input) {
-                      title = input;
-                      }, 'Title', 1),
-                    const Center(child: Text('Content')),
-                    InputText_widget(TextEditingController(text: ''), (input) {
-                      content = input;
-                    }, 'Content', 5),
-                  ],
-                ),
-                BlockPicker(
-                  pickerColor: Color(buttonColor),
-                  onColorChanged: (color) {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                    buttonColor = color.value;
-                  },
-                  availableColors: [
-                    Color(buttonColor),
-                    Colors.red,
-                    Colors.blue,
-                    Colors.green,
-                    Colors.yellow,
-                    Colors.purple
-                  ],
-                  itemBuilder: customItembuilder_colorPicker,
-                  layoutBuilder: customLayoutBuilder,
-                ),
-                ActionSlider.standard(
-                  width: 250,
-                  height: 50,
-                  controller: _controller,
-                  successIcon: IconButton(
-                    onPressed: () {
-                      FocusManager.instance.primaryFocus?.unfocus();
-                      alarm = 0;
-                      _controller.reset();
-                    },
-                    icon: const Icon(Icons.alarm),
-                  ),
-                  child: const Text('Set Alarm'),
-                  action: (controller) async {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                    if(DateTime.now().isBefore(DateTime(year,month,day))){
-                      alarm = 1;
-                      controller.loading(); //starts loading animation
-                      await Future.delayed(const Duration(seconds: 1));
-                      controller.success();
-                    }
-                    else{
-                      alarm = 0;
-                      SnackBar snackBar = const SnackBar(
-                        content: Text(
-                          'Not allowed past alarm',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 15, color: Colors.white),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          height: 15,
                         ),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    }
+                        Scroll_date(DateTime.now(), (dateTime) {
+                          year = dateTime.year;
+                          month = dateTime.month;
+                          day = dateTime.day;
+                          if(DateTime(year,month,day).isBefore(DateTime.now())){
+                            _controller.reset();
+                          }
+                        }),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Center(child: Text('Title')),
+                            InputText_widget(TextEditingController(text: ''), (input) {
+                              title = input;
+                            }, 'Title', 1),
+                            const Center(child: Text('Content')),
+                            InputText_widget(TextEditingController(text: ''), (input) {
+                              content = input;
+                            }, 'Content', 5),
+                          ],
+                        ),
+                        BlockPicker(
+                          pickerColor: Color(buttonColor),
+                          onColorChanged: (color) {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                            buttonColor = color.value;
+                          },
+                          availableColors: [
+                            Color(buttonColor),
+                            Colors.red,
+                            Colors.blue,
+                            Colors.green,
+                            Colors.yellow,
+                            Colors.purple
+                          ],
+                          itemBuilder: customItembuilder_colorPicker,
+                          layoutBuilder: customLayoutBuilder,
+                        ),
+                        ActionSlider.standard(
+                          width: 250,
+                          height: 50,
+                          controller: _controller,
+                          successIcon: IconButton(
+                            onPressed: () {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                              alarm = 0;
+                              _controller.reset();
+                            },
+                            icon: const Icon(Icons.alarm),
+                          ),
+                          child: const Text('Set Alarm'),
+                          action: (controller) async {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                            if(DateTime.now().isBefore(DateTime(year,month,day))){
+                              alarm = 1;
+                              controller.loading(); //starts loading animation
+                              await Future.delayed(const Duration(seconds: 1));
+                              controller.success();
+                            }
+                            else{
+                              alarm = 0;
+                              SnackBar snackBar = const SnackBar(
+                                content: Text(
+                                  'Not allowed past alarm',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 15, color: Colors.white),
+                                ),
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                            }
 
-                  },
-                )
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
-            ),
+            )
+                
           ),
         ),
       ),

@@ -4,7 +4,7 @@ class Utilities {
     DateTime now = DateTime.now();
     int gap = selectedDate.difference(now).inDays;
     if(now.isAfter(selectedDate)){
-      return "-${gap.toString()}";
+      return "${gap.toString()}";
     }
     else {
       return "+${gap.toString()}";

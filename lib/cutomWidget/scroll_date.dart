@@ -24,6 +24,8 @@ class _Scroll_dateState extends State<Scroll_date> {
         SizedBox(
           height: 200,
           child: ScrollDatePicker(
+            maximumDate: DateTime.now().add(const Duration(days: 365*100)),
+            minimumDate: DateTime.now().subtract(const Duration(days: 365*100)),
             selectedDate: widget._selectedDate,
             locale: const Locale('en'),
             onDateTimeChanged: (DateTime value) {

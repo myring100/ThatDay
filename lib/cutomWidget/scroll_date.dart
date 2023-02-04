@@ -17,7 +17,7 @@ class _Scroll_dateState extends State<Scroll_date> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          "${widget._selectedDate.month}-${widget._selectedDate.day}-${widget._selectedDate.year}",
+          "${widget._selectedDate.month} - ${widget._selectedDate.day} - ${widget._selectedDate.year}",
           style: const TextStyle(color: Colors.black,fontSize: 20),
 
         ),

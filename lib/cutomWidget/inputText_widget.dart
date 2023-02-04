@@ -12,7 +12,7 @@ class InputText_widget extends StatelessWidget {
 
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+      padding: const EdgeInsets.fromLTRB(7, 15, 7, 15),
       child: TextField(
           controller: textEditingController,
           maxLines: maxLine,

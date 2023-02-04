@@ -46,65 +46,72 @@ class _ModifyPage extends State<ModifyPage> {
     int buttonColor = widget.table.backGround;
     int alarm = widget.table.alarm == 0 ? 0 : 1;
 
-    return GestureDetector(
-      onTapDown: (a) => FocusManager.instance.primaryFocus?.unfocus(),
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: true,
-          title: const Center(
-            child: Text(
-              'Modify Event',
-              style: TextStyle(fontSize: 20, color: Colors.white),
+    return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 65,
+        centerTitle: true,
+        automaticallyImplyLeading: true,
+        title: const Center(
+          child: Text(
+            'Modify Event',
+            style: TextStyle(fontSize: 20, color: Colors.white),
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: SizedBox(
+        height: 60,
+        width: 60,
+        child: FittedBox(
+          child: Visibility(
+            visible: keyboardVisibilityController.isVisible ? false : true,
+            child: FloatingActionButton(
+              //:todo 여기서 뒤로 돌아가는 버튼이 생선된다.
+              onPressed: () async {
+                if (title != '' && content != '') {
+                  if (alarm == 1) {
+                    print('alarm = 1');
+                    NotificationHelper notificationHelper = NotificationHelper();
+                    notificationHelper.cancelNoti(id);
+                    notificationHelper.createNotification(
+                        id, title, content, DateTime(year, month, day));
+                  } else if (alarm == 0) {
+                    print('alarm = 0');
+
+                    NotificationHelper notificationHelper = NotificationHelper();
+                    notificationHelper.cancelNoti(id);
+                  }
+                  DBDao dao = DBDao(
+                      year,
+                      day,
+                      month,
+                      title,
+                      content,
+                      buttonColor,
+                      alarm);
+                  DBHelper helper = DBHelper();
+                  await helper.modify(widget.id, dao).then((value) =>
+                      Get.to(() => const FirstPage()));
+                } else {
+                  SnackBar snackBar = const SnackBar(
+                    content: Text(
+                      'Please Fill Form',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 15, color: Colors.white),
+                    ),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                }
+              },
+              tooltip: 'ADD',
+              child: const Icon(Icons.check, size: 30),
             ),
           ),
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: Visibility(
-          visible: keyboardVisibilityController.isVisible ? false : true,
-          child: FloatingActionButton(
-            //:todo 여기서 뒤로 돌아가는 버튼이 생선된다.
-            onPressed: () async {
-              if (title != '' && content != '') {
-                if (alarm == 1) {
-                  print('alarm = 1');
-                  NotificationHelper notificationHelper = NotificationHelper();
-                  notificationHelper.cancelNoti(id);
-                  notificationHelper.createNotification(
-                      id, title, content, DateTime(year, month, day));
-                } else if (alarm == 0) {
-                  print('alarm = 0');
-
-                  NotificationHelper notificationHelper = NotificationHelper();
-                  notificationHelper.cancelNoti(id);
-                }
-                DBDao dao = DBDao(
-                    year,
-                    day,
-                    month,
-                    title,
-                    content,
-                    buttonColor,
-                    alarm);
-                DBHelper helper = DBHelper();
-                await helper.modify(widget.id, dao).then((value) =>
-                    Get.to(() => const FirstPage()));
-              } else {
-                SnackBar snackBar = const SnackBar(
-                  content: Text(
-                    'Please Fill Form',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 15, color: Colors.white),
-                  ),
-                );
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-              }
-            },
-            tooltip: 'ADD',
-            child: const Icon(Icons.check, size: 30),
-          ),
-        ),
-        body: SafeArea(
+      ),
+      body: Padding(
+        padding: const EdgeInsets.only(bottom: 75),
+        child: SafeArea(
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -132,7 +139,7 @@ class _ModifyPage extends State<ModifyPage> {
                     InputText_widget(TextEditingController(text: content),
                             (input) {
                           content = input;
-                        }, 'Content', 5),
+                        }, 'Content', 7),
                   ],
                 ),
                 BlockPicker(
@@ -196,6 +203,7 @@ class _ModifyPage extends State<ModifyPage> {
 
   @override
   void initState() {
+    print('initstate ModifyPage');
     super.initState();
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       if (widget.table.alarm == 1) {

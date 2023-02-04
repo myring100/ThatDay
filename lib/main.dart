@@ -15,13 +15,22 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      navigatorKey: navigatorKey,
-      title: 'That Day(D-Day)',
-      theme: ThemeData(
-        appBarTheme:  AppBarTheme(color: Colors.lightBlue[500])
+    return GestureDetector(
+      onTap: (){
+        print('ontap()in main page');
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      onTapDown: (a){
+        print('ontap down()in main page');
+      },
+      child: GetMaterialApp(
+        navigatorKey: navigatorKey,
+        title: 'That Day(D-Day)',
+        theme: ThemeData(
+          appBarTheme:  AppBarTheme(color: Colors.lightBlue[500])
+        ),
+        home: const FirstPage(),
       ),
-      home: const FirstPage(),
     );
   }
 }

@@ -24,7 +24,6 @@ class AddPage extends StatefulWidget {
 
 class _AddPageState extends State<AddPage> {
   final _controller = ActionSliderController();
-  bool isshowFAB = true;
 
   @override
   Widget build(BuildContext context) {
@@ -49,137 +48,132 @@ class _AddPageState extends State<AddPage> {
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: SizedBox(
-        height: 60,
-        width: 60,
-        child: FittedBox(
-          child: Visibility(
-            visible: keyboardVisibilityController.isVisible ? false : true,
-            child: FloatingActionButton(
-              //:todo 여기서 뒤로 돌아가는 버튼이 생선된다.
-              onPressed: () {
-                if (title != '' && content != '') {
-                  DBDao dao = DBDao(
-                      year, day, month, title, content, buttonColor, alarm);
-                  DBHelper helper = DBHelper();
-                  helper.insert(dao);
-                  if (alarm == 1) {
-                    NotificationHelper notificationHelper =
-                        NotificationHelper();
-                    notificationHelper.createNotification(
-                        id, title, content, DateTime(year, month, day));
-                  }
-                  Get.to(() => const FirstPage());
-                } else {
-                  SnackBar snackBar = const SnackBar(
-                    content: Text(
-                      'Please Fill Form',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 15, color: Colors.white),
-                    ),
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                }
-              },
-              tooltip: 'ADD',
-              child: const Icon(Icons.check, size: 30),
+      body: SafeArea(
+          child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 15,
             ),
-          ),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.only(bottom: 50),
-        child: SafeArea(
-            child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const SizedBox(
-                height: 15,
-              ),
-              Scroll_date(DateTime.now(), (dateTime) {
-                year = dateTime.year;
-                month = dateTime.month;
-                day = dateTime.day;
-                if (DateTime(year, month, day).isBefore(DateTime.now())) {
-                  _controller.reset();
-                }
-              }),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Center(child: Text('Title')),
-                  InputText_widget(TextEditingController(text: title), (input) {
-                    title = input;
-                  }, 'Title', 1),
-                  const Center(child: Text('Content')),
-                  InputText_widget(TextEditingController(text: content),
-                      (input) {
-                    content = input;
-                  }, 'Content', 8),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ActionSlider.standard(
-                  width: 250,
-                  height: 50,
-                  controller: _controller,
-                  successIcon: IconButton(
-                    onPressed: () {
-                      FocusManager.instance.primaryFocus?.unfocus();
-                      alarm = 0;
-                      _controller.reset();
-                    },
-                    icon: const Icon(Icons.alarm),
-                  ),
-                  child: const Text(
-                    'Swipe Alarm',
-                    style: TextStyle(fontSize: 15),
-                  ),
-                  action: (controller) async {
+            Scroll_date(DateTime.now(), (dateTime) {
+              year = dateTime.year;
+              month = dateTime.month;
+              day = dateTime.day;
+              if (DateTime(year, month, day).isBefore(DateTime.now())) {
+                _controller.reset();
+              }
+            }),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Center(child: Text('Title')),
+                InputText_widget(TextEditingController(text: title), (input) {
+                  title = input;
+                }, 'Title', 1),
+                const Center(child: Text('Content')),
+                InputText_widget(TextEditingController(text: content),
+                    (input) {
+                  content = input;
+                }, 'Content', 8),
+              ],
+            ),
+            BlockPicker(
+              pickerColor: Color(buttonColor),
+              onColorChanged: (color) {
+                FocusManager.instance.primaryFocus?.unfocus();
+                buttonColor = color.value;
+              },
+              availableColors: [
+                Color(buttonColor),
+                Colors.pinkAccent,
+                Colors.blue,
+                Colors.green,
+                Colors.yellow,
+                Colors.purple
+              ],
+              itemBuilder: customItembuilder_colorPicker,
+              layoutBuilder: customLayoutBuilder,
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ActionSlider.standard(
+                width: 250,
+                height: 50,
+                controller: _controller,
+                successIcon: IconButton(
+                  onPressed: () {
                     FocusManager.instance.primaryFocus?.unfocus();
-                    if (DateTime.now().isBefore(DateTime(year, month, day))) {
-                      alarm = 1;
-                      controller.loading(); //starts loading animation
-                      await Future.delayed(const Duration(seconds: 1));
-                      controller.success();
-                    } else {
-                      alarm = 0;
-                      SnackBar snackBar = const SnackBar(
-                        content: Text(
-                          'Not allowed past alarm',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 15, color: Colors.white),
-                        ),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    }
+                    alarm = 0;
+                    _controller.reset();
                   },
+                  icon: const Icon(Icons.alarm),
+                ),
+                child: const Text(
+                  'Swipe Alarm',
+                  style: TextStyle(fontSize: 15),
+                ),
+                action: (controller) async {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  if (DateTime.now().isBefore(DateTime(year, month, day))) {
+                    alarm = 1;
+                    controller.loading(); //starts loading animation
+                    await Future.delayed(const Duration(seconds: 1));
+                    controller.success();
+                  } else {
+                    alarm = 0;
+                    SnackBar snackBar = const SnackBar(
+                      content: Text(
+                        'Not allowed past alarm',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 15, color: Colors.white),
+                      ),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  }
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+              child: ElevatedButton(
+                onPressed: () {
+                  if (title != '' && content != '') {
+                    DBDao dao = DBDao(
+                        year, day, month, title, content, buttonColor, alarm);
+                    DBHelper helper = DBHelper();
+                    helper.insert(dao);
+                    if (alarm == 1) {
+                      NotificationHelper notificationHelper =
+                      NotificationHelper();
+                      notificationHelper.createNotification(
+                          id, title, content, DateTime(year, month, day));
+                    }
+                    Get.to(() => const FirstPage());
+                  } else {
+                    SnackBar snackBar = const SnackBar(
+                      content: Text(
+                        'Please Fill Form',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 15, color: Colors.white),
+                      ),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  }
+                },
+                child: Icon(Icons.check, color: Colors.white),
+                style: ElevatedButton.styleFrom(
+                  shape: CircleBorder(),
+                  padding: EdgeInsets.all(17),
+                  backgroundColor: Colors.blue, // <-- Button color
+                  foregroundColor: Colors.red, // <-- Splash color
                 ),
               ),
-              BlockPicker(
-                pickerColor: Color(buttonColor),
-                onColorChanged: (color) {
-                  FocusManager.instance.primaryFocus?.unfocus();
-                  buttonColor = color.value;
-                },
-                availableColors: [
-                  Color(buttonColor),
-                  Colors.red,
-                  Colors.blue,
-                  Colors.green,
-                  Colors.yellow,
-                  Colors.purple
-                ],
-                itemBuilder: customItembuilder_colorPicker,
-                layoutBuilder: customLayoutBuilder,
-              ),
-            ],
-          ),
-        )),
-      ),
+            )
+          ],
+        ),
+      )),
     );
   }
 

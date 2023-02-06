@@ -13,7 +13,6 @@ import 'package:action_slider/action_slider.dart';
 
 import '../service/notificationHelper.dart';
 
-
 late StreamSubscription<bool> keyboardSubscription;
 var keyboardVisibilityController = KeyboardVisibilityController();
 
@@ -29,13 +28,11 @@ class ModifyPage extends StatefulWidget {
 
 class _ModifyPage extends State<ModifyPage> {
   final _controller = ActionSliderController();
-  bool showFAB = true;
 
   @override
   Widget build(BuildContext context) {
     int id = widget.id;
     print('getten ID in modifiy page = $id');
-
     DateTime selectedDate;
     int year = widget.table.year;
     int month = widget.table.month;
@@ -58,143 +55,134 @@ class _ModifyPage extends State<ModifyPage> {
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: SizedBox(
-        height: 60,
-        width: 60,
-        child: FittedBox(
-          child: Visibility(
-            visible: keyboardVisibilityController.isVisible ? false : true,
-            child: FloatingActionButton(
-              //:todo 여기서 뒤로 돌아가는 버튼이 생선된다.
-              onPressed: () async {
-                if (title != '' && content != '') {
-                  if (alarm == 1) {
-                    print('alarm = 1');
-                    NotificationHelper notificationHelper = NotificationHelper();
-                    notificationHelper.cancelNoti(id);
-                    notificationHelper.createNotification(
-                        id, title, content, DateTime(year, month, day));
-                  } else if (alarm == 0) {
-                    print('alarm = 0');
-
-                    NotificationHelper notificationHelper = NotificationHelper();
-                    notificationHelper.cancelNoti(id);
-                  }
-                  DBDao dao = DBDao(
-                      year,
-                      day,
-                      month,
-                      title,
-                      content,
-                      buttonColor,
-                      alarm);
-                  DBHelper helper = DBHelper();
-                  await helper.modify(widget.id, dao).then((value) =>
-                      Get.to(() => const FirstPage()));
-                } else {
-                  SnackBar snackBar = const SnackBar(
-                    content: Text(
-                      'Please Fill Form',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 15, color: Colors.white),
-                    ),
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 15,
+              ),
+              Scroll_date(selectedDate, (dateTime) {
+                year = dateTime.year;
+                month = dateTime.month;
+                day = dateTime.day;
+                if (DateTime(year, month, day).isBefore(DateTime.now())) {
+                  _controller.reset();
                 }
-              },
-              tooltip: 'ADD',
-              child: const Icon(Icons.check, size: 30),
-            ),
-          ),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.only(bottom: 75),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 15,
-                ),
-                Scroll_date(selectedDate, (dateTime) {
-                  year = dateTime.year;
-                  month = dateTime.month;
-                  day = dateTime.day;
-                  if (DateTime(year, month, day).isBefore(DateTime.now())) {
+              }),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Center(child: Text('Title')),
+                  InputText_widget(TextEditingController(text: title),
+                      (input) {
+                    title = input;
+                  }, 'Title', 1),
+                  const Center(child: Text('Content')),
+                  InputText_widget(TextEditingController(text: content),
+                      (input) {
+                    content = input;
+                  }, 'Content', 7),
+                ],
+              ),
+              BlockPicker(
+                pickerColor: Color(buttonColor),
+                onColorChanged: (color) {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  buttonColor = color.value;
+                },
+                availableColors: const [
+                  Colors.white,
+                  Colors.red,
+                  Colors.blue,
+                  Colors.green,
+                  Colors.yellow,
+                  Colors.purple
+                ],
+                itemBuilder: customItembuilder_colorPicker,
+                layoutBuilder: customLayoutBuilder,
+              ),
+              ActionSlider.standard(
+                width: 250,
+                height: 50,
+                controller: _controller,
+                successIcon: IconButton(
+                  onPressed: () {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    alarm = 0;
                     _controller.reset();
-                  }
-                }),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Center(child: Text('Title')),
-                    InputText_widget(
-                        TextEditingController(text: title), (input) {
-                      title = input;
-                    }, 'Title', 1),
-                    const Center(child: Text('Content')),
-                    InputText_widget(TextEditingController(text: content),
-                            (input) {
-                          content = input;
-                        }, 'Content', 7),
-                  ],
-                ),
-                BlockPicker(
-                  pickerColor: Color(buttonColor),
-                  onColorChanged: (color) {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                    buttonColor = color.value;
                   },
-                  availableColors: const [
-                    Colors.white,
-                    Colors.red,
-                    Colors.blue,
-                    Colors.green,
-                    Colors.yellow,
-                    Colors.purple
-                  ],
-                  itemBuilder: customItembuilder_colorPicker,
-                  layoutBuilder: customLayoutBuilder,
+                  icon: const Icon(Icons.alarm),
                 ),
-                ActionSlider.standard(
-                  width: 250,
-                  height: 50,
-                  controller: _controller,
-                  successIcon: IconButton(
-                    onPressed: () {
-                      FocusManager.instance.primaryFocus?.unfocus();
-                      alarm = 0;
-                      _controller.reset();
-                    },
-                    icon: const Icon(Icons.alarm),
-                  ),
-                  child: const Text('Set Alarm'),
-                  action: (controller) async {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                    controller.loading(); //starts loading animation
-                    await Future.delayed(const Duration(seconds: 1));
-                    if (DateTime.now().isAfter(DateTime(year, month, day))) {
-                      alarm = 0;
+                child: const Text('Set Alarm'),
+                action: (controller) async {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  controller.loading(); //starts loading animation
+                  await Future.delayed(const Duration(seconds: 1));
+                  if (DateTime.now().isAfter(DateTime(year, month, day))) {
+                    alarm = 0;
+                    SnackBar snackBar = const SnackBar(
+                      content: Text(
+                        'Not allowed past alarm',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 15, color: Colors.white),
+                      ),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    controller.reset();
+                  } else {
+                    controller.success();
+                    alarm = 1;
+                  }
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0,8,0,8),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (title != '' && content != '') {
+                      if (alarm == 1) {
+                        print('alarm = 1');
+                        NotificationHelper notificationHelper =
+                        NotificationHelper();
+                        notificationHelper.cancelNoti(id);
+                        notificationHelper.createNotification(
+                            id, title, content, DateTime(year, month, day));
+                      } else if (alarm == 0) {
+                        print('alarm = 0');
+
+                        NotificationHelper notificationHelper =
+                        NotificationHelper();
+                        notificationHelper.cancelNoti(id);
+                      }
+                      DBDao dao = DBDao(
+                          year, day, month, title, content, buttonColor, alarm);
+                      DBHelper helper = DBHelper();
+                      await helper
+                          .modify(widget.id, dao)
+                          .then((value) => Get.to(() => const FirstPage()));
+                    } else {
                       SnackBar snackBar = const SnackBar(
                         content: Text(
-                          'Not allowed past alarm',
+                          'Please Fill Form',
                           textAlign: TextAlign.center,
                           style: TextStyle(fontSize: 15, color: Colors.white),
                         ),
                       );
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      controller.reset();
-                    } else {
-                      controller.success();
-                      alarm = 1;
                     }
                   },
+                  child: Icon(Icons.check, color: Colors.white),
+                  style: ElevatedButton.styleFrom(
+                    shape: CircleBorder(),
+                    padding: EdgeInsets.all(17),
+                    backgroundColor: Colors.blue, // <-- Button color
+                    foregroundColor: Colors.red, // <-- Splash color
+                  ),
                 ),
-              ],
-            ),
+              )
+            ],
           ),
         ),
       ),
@@ -214,8 +202,8 @@ class _ModifyPage extends State<ModifyPage> {
     });
   }
 
-  Widget customItembuilder_colorPicker(Color color, bool isCurrentColor,
-      void Function() changeColor) {
+  Widget customItembuilder_colorPicker(
+      Color color, bool isCurrentColor, void Function() changeColor) {
     return Container(
       margin: const EdgeInsets.all(7),
       decoration: BoxDecoration(
@@ -244,11 +232,9 @@ class _ModifyPage extends State<ModifyPage> {
     );
   }
 
-  Widget customLayoutBuilder(BuildContext context, List<Color> colors,
-      PickerItem child) {
-    Orientation orientation = MediaQuery
-        .of(context)
-        .orientation;
+  Widget customLayoutBuilder(
+      BuildContext context, List<Color> colors, PickerItem child) {
+    Orientation orientation = MediaQuery.of(context).orientation;
     return SizedBox(
       width: 400,
       height: orientation == Orientation.portrait ? 80 : 80,

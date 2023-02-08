@@ -13,6 +13,7 @@ import 'package:workmanager/workmanager.dart';
 
 @pragma("vm:entry-point")
 void callbackDispatcher() {
+  print('callbackDispatcher');
   Workmanager().executeTask((taskName, inputData) {
     final now = DateTime.now();
     return Future.wait<bool?>([
@@ -38,6 +39,7 @@ void callbackDispatcher() {
 @pragma("vm:entry-point")
 void backgroundCallback(Uri? data) async {
   print(data);
+  print('backgroundCallback');
 
   if (data?.host == 'titleclicked') {
     final greetings = [
@@ -102,6 +104,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
+
     super.initState();
     HomeWidget.setAppGroupId('YOUR_GROUP_ID');
     HomeWidget.registerBackgroundCallback(backgroundCallback);
@@ -114,12 +117,14 @@ class _MyAppState extends State<MyApp> {
   }
   @override
   void didChangeDependencies() {
+    print('didChangeDependencies');
     super.didChangeDependencies();
     _checkForWidgetLaunch();
     HomeWidget.widgetClicked.listen(_launchedFromWidget);
   }
 
   Future<Future<List<bool?>>> _sendData() async {
+    print('_sendData');
     try {
       return Future.wait([
         HomeWidget.saveWidgetData<String>('title', _titleController.text),
@@ -132,6 +137,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<Future<bool?>> _updateWidget() async {
+    print('_updateWidget');
     try {
       return HomeWidget.updateWidget(
           name: 'HomeWidgetExampleProvider', iOSName: 'HomeWidgetExample');
@@ -166,6 +172,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _launchedFromWidget(Uri? uri) {
+    print('_launchedFromWidget');
     if (uri != null) {
       showDialog(
           context: context,

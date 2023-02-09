@@ -51,6 +51,7 @@ void backgroundCallback(Uri? data) async {
         var itar = values.iterator;
         while (itar.moveNext()) {
           String title = itar.current['title'].toString();
+
           if (values.last['title'] == previous) {
             print('match here value.last == previous');
             title = itar.current['title'].toString();

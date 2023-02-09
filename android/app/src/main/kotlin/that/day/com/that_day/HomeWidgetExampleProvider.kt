@@ -18,10 +18,9 @@ class HomeWidgetExampleProvider : HomeWidgetProvider() {
                     context,
                     MainActivity::class.java)
                 setOnClickPendingIntent(R.id.widget_container, pendingIntent)
-
                 // Swap Title Text by calling Dart Code in the Background
                 setTextViewText(R.id.widget_title, widgetData.getString("title", null)
-                    ?: "No Title Set")
+                    ?: "ADD D-Day")
                 val backgroundIntent = HomeWidgetBackgroundIntent.getBroadcast(
                     context,
                     Uri.parse("homeWidgetExample://titleClicked")
@@ -30,7 +29,7 @@ class HomeWidgetExampleProvider : HomeWidgetProvider() {
 
                 val message = widgetData.getString("message", null)
                 setTextViewText(R.id.widget_message, message
-                    ?: "No Message Set")
+                    ?: "")
                 // Detect App opened via Click inside Flutter
                 val pendingIntentWithData = HomeWidgetLaunchIntent.getActivity(
                     context,

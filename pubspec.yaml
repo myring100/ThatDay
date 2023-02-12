@@ -47,6 +47,7 @@ dependencies:
   home_widget: ^0.2.0+1
   workmanager: ^0.5.1
   adaptive_dialog: ^1.8.2
+  google_mobile_ads: ^1.2.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

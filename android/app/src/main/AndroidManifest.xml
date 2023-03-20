@@ -6,8 +6,6 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:label="that_day">
-        <!-- Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713 -->
-        <!-- my admob id = ca-app-pub-3606480189908273~1027321220 -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-3606480189908273~1027321220" />

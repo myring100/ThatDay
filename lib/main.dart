@@ -29,6 +29,7 @@ class MyApp extends StatelessWidget {
         print('ontap down()in main page');
       },
       child: GetMaterialApp(
+        debugShowCheckedModeBanner: false,
         navigatorKey: navigatorKey,
         title: 'That Day(D-Day)',
         theme: ThemeData(

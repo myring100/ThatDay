@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:that_day/DB/DBDao.dart';
 import 'package:that_day/DB/DBHelper.dart';
 import 'package:that_day/screen/firstPage.dart';
 import 'package:that_day/cutomWidget/scroll_date.dart';
+import '../adHelper.dart';
 import '../cutomWidget/inputText_widget.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:action_slider/action_slider.dart';
@@ -28,6 +30,7 @@ class ModifyPage extends StatefulWidget {
 
 class _ModifyPage extends State<ModifyPage> {
   final _controller = ActionSliderController();
+  BannerAd? _bannerAd;
 
   @override
   Widget build(BuildContext context) {
@@ -103,6 +106,15 @@ class _ModifyPage extends State<ModifyPage> {
                 itemBuilder: customItembuilder_colorPicker,
                 layoutBuilder: customLayoutBuilder,
               ),
+              if (_bannerAd != null)
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Container(
+                    width: _bannerAd!.size.width.toDouble(),
+                    height: _bannerAd!.size.height.toDouble(),
+                    child: AdWidget(ad: _bannerAd!),
+                  ),
+                ),
               ActionSlider.standard(
                 width: 250,
                 height: 50,
@@ -193,6 +205,27 @@ class _ModifyPage extends State<ModifyPage> {
   void initState() {
     print('initstate ModifyPage');
     super.initState();
+    BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId,
+      request: AdRequest(),
+      size: AdSize.banner,
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            super.setState(() {
+              _bannerAd = ad as BannerAd;
+            });
+            print('admob onload');
+
+          });
+        },
+        onAdFailedToLoad: (ad, err) {
+          print(
+              'admob Failed to load a banner ad: ${err.message} domain : ${err.responseInfo}');
+          ad.dispose();
+        },
+      ),
+    ).load();
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       if (widget.table.alarm == 1) {
         _controller.loading();

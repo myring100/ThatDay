@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:that_day/DB/DBDao.dart';
 import 'package:that_day/DB/DBHelper.dart';
 import 'package:that_day/screen/firstPage.dart';
 import 'package:that_day/cutomWidget/scroll_date.dart';
 import 'package:that_day/service/notificationHelper.dart';
+import '../adHelper.dart';
 import '../cutomWidget/inputText_widget.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:action_slider/action_slider.dart';
@@ -24,6 +26,7 @@ class AddPage extends StatefulWidget {
 
 class _AddPageState extends State<AddPage> {
   final _controller = ActionSliderController();
+  BannerAd? _bannerAd;
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +59,7 @@ class _AddPageState extends State<AddPage> {
             const SizedBox(
               height: 15,
             ),
+
             Scroll_date(DateTime.now(), (dateTime) {
               year = dateTime.year;
               month = dateTime.month;
@@ -95,7 +99,15 @@ class _AddPageState extends State<AddPage> {
               itemBuilder: customItembuilder_colorPicker,
               layoutBuilder: customLayoutBuilder,
             ),
-
+            if (_bannerAd != null)
+              Align(
+                alignment: Alignment.topCenter,
+                child: Container(
+                  width: _bannerAd!.size.width.toDouble(),
+                  height: _bannerAd!.size.height.toDouble(),
+                  child: AdWidget(ad: _bannerAd!),
+                ),
+              ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ActionSlider.standard(
@@ -182,6 +194,27 @@ class _AddPageState extends State<AddPage> {
     print('initstate addPage');
 
     super.initState();
+    BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId,
+      request: AdRequest(),
+      size: AdSize.banner,
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            super.setState(() {
+              _bannerAd = ad as BannerAd;
+            });
+            print('admob onload');
+
+          });
+        },
+        onAdFailedToLoad: (ad, err) {
+          print(
+              'admob Failed to load a banner ad: ${err.message} domain : ${err.responseInfo}');
+          ad.dispose();
+        },
+      ),
+    ).load();
   }
 
   Widget customItembuilder_colorPicker(

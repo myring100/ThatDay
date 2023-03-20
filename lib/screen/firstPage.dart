@@ -60,9 +60,12 @@ class _FirstPageState extends State<FirstPage> {
       body: Padding(
         padding: const EdgeInsets.only(bottom: 50),
         child:
-            Stack(
-              fit: StackFit.expand,
+            Column(
+
               children: [
+                const SizedBox(
+                  height: 15,
+                ),
                 if (_bannerAd != null)
                   Align(
                     alignment: Alignment.topCenter,
@@ -103,12 +106,24 @@ class _FirstPageState extends State<FirstPage> {
                                   margin: const EdgeInsets.fromLTRB(7, 15, 7,0),
                                   shadowColor: Colors.grey,
                                   color: Color(backGround),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10),
-                                    child: ListTile(
-                                      onTap: ()=>Get.to(ModifyPage(id, table)),
-                                      title: Text(title,style: kListMainText,textAlign: TextAlign.center,),
-                                      subtitle: Text(dDay,textAlign: TextAlign.right,style: kListSubTitle,),
+                                  child: Container(
+                                    height: 80,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10),
+                                      child: InkWell(
+                                        onTap: ()=>Get.to(ModifyPage(id, table)),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(child: Text(title,style: kListMainText,textAlign: TextAlign.center,)),
+                                            Align(
+                                                alignment: Alignment.centerRight,
+                                                child: Text(dDay,textAlign: TextAlign.right,style: kListSubTitle,))
+                                          ],
+                                        ),
+                                        // title: Text(title,style: kListMainText,textAlign: TextAlign.center,),
+                                        // subtitle: Text(dDay,textAlign: TextAlign.right,style: kListSubTitle,),
+                                      ),
                                     ),
                                   ),
                                 );
@@ -188,10 +203,12 @@ class _FirstPageState extends State<FirstPage> {
   }
 
   Widget customText(String text) {
-    return Center(
-        child: Text(
-      text,
-      style: kCustomText,
-    ));
+    return Expanded(
+      child: Center(
+          child: Text(
+        text,
+        style: kCustomText,
+      )),
+    );
   }
 }

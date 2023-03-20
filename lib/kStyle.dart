@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 
-TextStyle kListMainText = const TextStyle(fontSize: 25);
-TextStyle kListSubTitle = const TextStyle(fontSize: 25);
+TextStyle kListMainText = const TextStyle(fontSize: 25,color: Colors.black);
+TextStyle kListSubTitle = const TextStyle(fontSize: 25,color: Colors.grey);
 TextStyle kCustomText = const TextStyle(fontSize: 24);
 TextStyle kMainTitle = const TextStyle(fontSize: 24);
 

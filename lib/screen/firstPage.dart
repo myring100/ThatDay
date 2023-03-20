@@ -111,7 +111,6 @@ class _FirstPageState extends State<FirstPage> {
                                     child: Padding(
                                       padding: const EdgeInsets.all(10),
                                       child: InkWell(
-
                                         onTap: ()=>Get.to(ModifyPage(id, table)),
                                         child: Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
